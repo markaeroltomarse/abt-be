@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model ProductEntity {
+  id       String       @id @default(cuid()) @map("_id")
+  name     String
+  quantity Int?         @default(0)
+  items    ItemEntity[]
+
+  createdAt DateTime? @default(now()) @map("created_at")
+  updatedAt DateTime? @default(now()) @map("updated_at")
+
+  @@map("products")
+}
+
+model ItemEntity {
+  id            String              @id @default(cuid()) @map("_id")
+  productId     String
+  quantity      Int
+  kilo          Int
+  customer      String?             @default("No name")
+  product       ProductEntity?      @relation(fields: [productId], references: [id])
+  from          ItemDestinationEnum @default(IN)
+  dateArrived   String
+  recieptNumber Int
+  createdAt     DateTime?           @default(now()) @map("created_at")
+  updatedAt     DateTime?           @default(now()) @map("updated_at")
+
+  @@map("items")
+}
+
+model UserEntity {
+  id       String @id @default(cuid()) @map("_id")
+  type     String
+  email    String
+  password String
+
+  @@map("users")
+}
+
+enum ItemDestinationEnum {
+  IN
+  OUT
+}
